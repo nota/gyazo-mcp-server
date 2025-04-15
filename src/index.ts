@@ -191,6 +191,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         name: "gyazo_latest_image",
         description:
           "Fetch latest uploaded image content and metadata from Gyazo",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              const: "gyazo_latest_image",
+            },
+          },
+          required: ["name"],
+        },
       },
       {
         name: "gyazo_image",
