@@ -50,6 +50,10 @@ type GyazoImage = {
     locale: string;
     description: string;
   };
+  exif_normalized?: {
+    latitude: number;
+    longitude: number;
+  };
 };
 
 /**
@@ -127,7 +131,12 @@ const getImageMetadataMarkdown = (gyazoImage: GyazoImage) => {
     imageMetadataMarkdown += `### OCR:\n${gyazoImage.ocr.description}\n\n`;
   }
   if (gyazoImage.ocr?.locale) {
-    imageMetadataMarkdown += `### Locale:\n${gyazoImage.ocr.locale}\n\n`;
+    imageMetadataMarkdown += `### OCR Locale:\n${gyazoImage.ocr.locale}\n\n`;
+  }
+  if (gyazoImage.exif_normalized) {
+    imageMetadataMarkdown += `### EXIF Location:\n`;
+    imageMetadataMarkdown += `Latitude: ${gyazoImage.exif_normalized.latitude}\n`;
+    imageMetadataMarkdown += `Longitude: ${gyazoImage.exif_normalized.longitude}\n\n`;
   }
   return imageMetadataMarkdown;
 };
