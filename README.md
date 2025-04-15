@@ -30,7 +30,7 @@ This is a TypeScript-based MCP server that provides access to Gyazo images. It a
 Install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 Build the server:

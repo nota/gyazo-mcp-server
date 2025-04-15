@@ -203,13 +203,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "gyazo_search",
-        description: "Search through user's saved Gyazo images",
+        description: "Full-text search through user's saved Gyazo images",
         inputSchema: {
           type: "object",
           properties: {
             query: {
               type: "string",
-              description: "Search query (max length: 200 characters)",
+              description: "Search keyword (max length: 200 characters). example: 'cat', 'title:cat', 'app:\"Google Chrome\"', 'cat since:2024-01-01 until:2024-12-31'",
             },
             page: {
               type: "integer",
