@@ -189,16 +189,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "gyazo_latest_image",
-        description: "Fetch latest image content and metadata from Gyazo",
+        description:
+          "Fetch latest uploaded image content and metadata from Gyazo",
+      },
+      {
+        name: "gyazo_image",
+        description: "Fetch image content and metadata from Gyazo",
         inputSchema: {
           type: "object",
           properties: {
-            name: {
+            id: {
               type: "string",
-              const: "gyazo_latest_image",
+              description: "ID of the Gyazo image",
             },
           },
-          required: ["name"],
+          required: ["id"],
         },
       },
       {
@@ -209,7 +214,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             query: {
               type: "string",
-              description: "Search keyword (max length: 200 characters). example: 'cat', 'title:cat', 'app:\"Google Chrome\"', 'cat since:2024-01-01 until:2024-12-31'",
+              description:
+                "Search keyword (max length: 200 characters). example: 'cat', 'title:cat', 'app:\"Google Chrome\"', 'cat since:2024-01-01 until:2024-12-31'",
             },
             page: {
               type: "integer",
@@ -252,7 +258,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             app: {
               type: "string",
-              description: "Application name that captured the image (optional)",
+              description:
+                "Application name that captured the image (optional)",
             },
           },
           required: ["imageData"],
@@ -268,8 +275,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
  */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (request.params.name === "gyazo_search") {
-    if (!request.params.arguments || typeof request.params.arguments.query !== "string") {
-      throw new Error("Invalid search arguments: query is required and must be a string");
+    if (
+      !request.params.arguments ||
+      typeof request.params.arguments.query !== "string"
+    ) {
+      throw new Error(
+        "Invalid search arguments: query is required and must be a string"
+      );
     }
 
     const endpoint = "https://api.gyazo.com/api/search";
@@ -277,8 +289,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     params.append("access_token", GYAZO_ACCESS_TOKEN);
     params.append("query", request.params.arguments.query);
 
-    const page = typeof request.params.arguments.page === "number" ? request.params.arguments.page : 1;
-    const per = typeof request.params.arguments.per === "number" ? request.params.arguments.per : 20;
+    const page =
+      typeof request.params.arguments.page === "number"
+        ? request.params.arguments.page
+        : 1;
+    const per =
+      typeof request.params.arguments.per === "number"
+        ? request.params.arguments.per
+        : 20;
 
     params.append("page", page.toString());
     params.append("per", per.toString());
@@ -292,8 +310,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: "text",
             text: "No images found",
-          }
-        ]
+          },
+        ],
       };
     }
 
@@ -315,9 +333,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       content: [
         {
           type: "text",
-          text: JSON.stringify(contents, null, 2)
-        }
-      ]
+          text: JSON.stringify(contents, null, 2),
+        },
+      ],
     };
   } else if (request.params.name === "gyazo_latest_image") {
     const endpoint = "https://api.gyazo.com/api/images";
@@ -352,39 +370,86 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         },
       ],
     };
+  } else if (request.params.name === "gyazo_image") {
+    if (
+      !request.params.arguments ||
+      typeof request.params.arguments.id !== "string"
+    ) {
+      throw new Error(
+        "Invalid image arguments: id is required and must be a string"
+      );
+    }
+
+    const endpoint = `https://api.gyazo.com/api/images/${request.params.arguments.id}`;
+    const params = new URLSearchParams();
+    params.append("access_token", GYAZO_ACCESS_TOKEN);
+    const response = await fetch(`${endpoint}?${params.toString()}`);
+    const gyazoImage: GyazoImage = await response.json();
+
+    if (!gyazoImage) {
+      throw new Error(`Image ${request.params.arguments.id} not found`);
+    }
+
+    const imageUrl = gyazoImage.url;
+    const imageBlob = await fetch(imageUrl).then((res) => res.blob());
+    const imageBuffer = await imageBlob.arrayBuffer();
+    const imageBase64 = Buffer.from(imageBuffer).toString("base64");
+
+    const imageMetadataMarkdown = getImageMetadataMarkdown(gyazoImage);
+
+    return {
+      content: [
+        {
+          type: "image",
+          data: imageBase64,
+          mimeType: `image/${gyazoImage.type}`,
+        },
+        {
+          type: "text",
+          text: imageMetadataMarkdown,
+        },
+      ],
+    };
   } else if (request.params.name === "gyazo_upload") {
-    if (!request.params.arguments || typeof request.params.arguments.imageData !== "string") {
-      throw new Error("Invalid upload arguments: imageData is required and must be a string");
+    if (
+      !request.params.arguments ||
+      typeof request.params.arguments.imageData !== "string"
+    ) {
+      throw new Error(
+        "Invalid upload arguments: imageData is required and must be a string"
+      );
     }
 
     try {
       const endpoint = "https://upload.gyazo.com/api/upload";
-      
+
       // Base64 データをバイナリに変換
       const base64Data = request.params.arguments.imageData;
       // Base64 のプレフィックス (例: "data:image/png;base64,") を削除
       const base64Image = base64Data.replace(/^data:image\/(\w+);base64,/, "");
-      
+
       // 画像形式を取得（プレフィックスから）
       let imageType = "png"; // デフォルト値
       const typeMatch = base64Data.match(/^data:image\/(\w+);base64,/);
       if (typeMatch && typeMatch[1]) {
         imageType = typeMatch[1];
       }
-      
+
       // バイナリデータに変換
-      const imageBuffer = Buffer.from(base64Image, 'base64');
-      
+      const imageBuffer = Buffer.from(base64Image, "base64");
+
       // FormData オブジェクトを作成
       const formData = new FormData();
-      
+
       // File オブジェクトを作成し、ファイル名を指定
       const fileName = `screenshot_${Date.now()}.${imageType}`;
-      const file = new File([imageBuffer], fileName, { type: `image/${imageType}` });
-      
+      const file = new File([imageBuffer], fileName, {
+        type: `image/${imageType}`,
+      });
+
       // ファイル名付きで imagedata を追加
       formData.append("imagedata", file);
-      
+
       // オプションのパラメータを追加
       if (request.params.arguments.title) {
         formData.append("title", String(request.params.arguments.title));
@@ -393,34 +458,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         formData.append("desc", String(request.params.arguments.description));
       }
       if (request.params.arguments.refererUrl) {
-        formData.append("referer_url", String(request.params.arguments.refererUrl));
+        formData.append(
+          "referer_url",
+          String(request.params.arguments.refererUrl)
+        );
       }
       if (request.params.arguments.app) {
         formData.append("app", String(request.params.arguments.app));
       }
-      
+
       // アクセストークンを追加
       formData.append("access_token", GYAZO_ACCESS_TOKEN);
-      
+
       // アップロードリクエストを送信
       const response = await fetch(endpoint, {
         method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error(`Upload failed with status: ${response.status}`);
       }
-      
+
       const result = await response.json();
-      
+
       return {
         content: [
           {
             type: "text",
             text: `Image successfully uploaded to Gyazo!\n\nPermalink URL: ${result.permalink_url}\nImage URL: ${result.url}\nImage ID: ${result.image_id}`,
-          }
-        ]
+          },
+        ],
       };
     } catch (error) {
       console.error("Upload error:", error);
