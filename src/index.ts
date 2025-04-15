@@ -188,20 +188,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: "get_latest_image",
-        description: "Fetch the latest image content and metadata from Gyazo",
-        inputSchema: {
-          type: "object",
-          properties: {
-            name: {
-              type: "string",
-              const: "get_latest_image",
-            },
-          },
-          required: ["name"],
-        },
-      },
-      {
         name: "search_images",
         description: "Full-text search through user's saved Gyazo images",
         inputSchema: {
@@ -258,6 +244,20 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ["imageData"],
+        },
+      },
+      {
+        name: "get_latest_image",
+        description: "Get the latest image content and metadata from Gyazo",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              const: "get_latest_image",
+            },
+          },
+          required: ["name"],
         },
       },
     ],

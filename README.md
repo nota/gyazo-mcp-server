@@ -21,13 +21,13 @@ This is a TypeScript-based MCP server that provides access to Gyazo images. It a
 
 ### Tools
 
-- `get_latest_image` - Get the latest image from Gyazo
-  - Returns Gyazo image objects with URIs and metadata
-  - Includes OCR text if available
 - `search_images` - Search for images by words in metadata
   - Returns a list of matching images
 - `upload_image` - Upload a new image to Gyazo
   - Returns the uploaded image's url
+- `get_latest_image` - Get the latest image from Gyazo
+  - Returns Gyazo image objects with URIs and metadata
+  - Includes OCR text if available
 
 ## Development
 
