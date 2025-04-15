@@ -14,16 +14,20 @@ This is a TypeScript-based MCP server that provides access to Gyazo images. It a
 
 - List and access Gyazo images via `gyazo-mcp://` URIs
 - Each image includes:
-  - Original image content
-  - Metadata (title, description, app, URL)
+  - Original image content URLs
+  - Metadata (title, description, app)
   - OCR data (if available)
 - Supports various image formats (JPEG, PNG, etc.)
 
 ### Tools
 
-- `gyazo_latest_image` - Fetch the most recent image from Gyazo
-  - Returns both image content and metadata
+- `get_latest_image` - Get the latest image from Gyazo
+  - Returns Gyazo image objects with URIs and metadata
   - Includes OCR text if available
+- `search_images` - Search for images by words in metadata
+  - Returns a list of matching images
+- `upload_image` - Upload a new image to Gyazo
+  - Returns the uploaded image's url
 
 ## Development
 

@@ -188,21 +188,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: "gyazo_latest_image",
-        description: "Fetch latest image content and metadata from Gyazo",
+        name: "get_latest_image",
+        description: "Fetch the latest image content and metadata from Gyazo",
         inputSchema: {
           type: "object",
           properties: {
             name: {
               type: "string",
-              const: "gyazo_latest_image",
+              const: "get_latest_image",
             },
           },
           required: ["name"],
         },
       },
       {
-        name: "gyazo_search",
+        name: "search_images",
         description: "Full-text search through user's saved Gyazo images",
         inputSchema: {
           type: "object",
@@ -230,7 +230,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: "gyazo_upload",
+        name: "upload_image",
         description: "Upload an image to Gyazo",
         inputSchema: {
           type: "object",
@@ -269,7 +269,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
  * This server provides a single tool for fetching image metadata.
  */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "gyazo_search") {
+  if (request.params.name === "search_images") {
     if (
       !request.params.arguments ||
       typeof request.params.arguments.query !== "string"
@@ -332,7 +332,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         },
       ],
     };
-  } else if (request.params.name === "gyazo_latest_image") {
+  } else if (request.params.name === "get_latest_image") {
     const endpoint = "https://api.gyazo.com/api/images";
     const params = new URLSearchParams();
     params.append("access_token", GYAZO_ACCESS_TOKEN);
@@ -365,7 +365,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         },
       ],
     };
-  } else if (request.params.name === "gyazo_upload") {
+  } else if (request.params.name === "upload_image") {
     if (
       !request.params.arguments ||
       typeof request.params.arguments.imageData !== "string"
