@@ -8,7 +8,6 @@ import {
 import * as api from "../api.js";
 import { getImageMetadataMarkdown } from "../utils.js";
 import { createImageUri } from "../utils.js";
-import { GyazoImage, SearchedGyazoImage } from "../types.js";
 
 /**
  * Handler for listing available tools
