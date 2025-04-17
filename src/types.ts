@@ -22,6 +22,10 @@ export type GyazoImage = {
     locale: string;
     description: string;
   };
+  exif_normalized?: {
+    latitude: number;
+    longitude: number;
+  };
 };
 
 /**
