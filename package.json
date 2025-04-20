@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "mcp-proxy": "^2.12.0",
     "typescript": "^5.3.3"
   }
 }
