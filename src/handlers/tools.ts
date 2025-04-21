@@ -223,7 +223,9 @@ async function handleGyazoImage(request: any) {
   if (!gyazoImage) {
     throw new Error("Image not found");
   }
-  const imageBase64 = await api.fetchImageAsBase64(gyazoImage.url);
+  const { data: imageBase64, mimeType } = await api.fetchImageAsBase64(
+    gyazoImage.url
+  );
   const imageMetadataMarkdown = getImageMetadataMarkdown(gyazoImage);
 
   return {
@@ -231,7 +233,7 @@ async function handleGyazoImage(request: any) {
       {
         type: "image",
         data: imageBase64,
-        mimeType: `image/${gyazoImage.type}`,
+        mimeType: mimeType,
       },
       {
         type: "text",
@@ -252,14 +254,16 @@ async function handleGyazoLatestImage() {
   }
 
   const image = images[0];
-  const imageBase64 = await api.fetchImageAsBase64(image.url);
+  const { data: imageBase64, mimeType } = await api.fetchImageAsBase64(
+    image.url
+  );
 
   return {
     content: [
       {
         type: "image",
         data: imageBase64,
-        mimeType: `image/${image.type}`,
+        mimeType: mimeType,
       },
       {
         type: "text",
@@ -285,7 +289,43 @@ async function handleGyazoUpload(request: any) {
   const { imageData, title, description, refererUrl, app } =
     request.params.arguments;
 
-  const result = await api.uploadImage(imageData, {
+  // 最大サイズは0.75MBに設定
+  const maxSizeBytes = 0.75 * 1024 * 1024;
+
+  // 画像サイズをチェックし、必要に応じて圧縮
+  let processedImageData = imageData;
+  let mimeType = "image/png"; // デフォルト値
+
+  // image/dataの形式かチェック
+  if (imageData.startsWith("data:")) {
+    const typeMatch = imageData.match(/^data:([^;]+);base64,/);
+    if (typeMatch && typeMatch[1]) {
+      mimeType = typeMatch[1];
+    }
+
+    // Base64データ部分を抽出
+    const base64Part = imageData.split(",")[1];
+    if (Buffer.from(base64Part, "base64").length > maxSizeBytes) {
+      // サイズが大きすぎる場合は圧縮
+      const { data, mimeType: newMimeType } = await import("../utils.js").then(
+        (module) => module.compressImageIfNeeded(imageData, maxSizeBytes)
+      );
+      processedImageData = data;
+      mimeType = newMimeType;
+    }
+  } else {
+    // Base64文字列のみの場合
+    if (Buffer.from(imageData, "base64").length > maxSizeBytes) {
+      // サイズが大きすぎる場合は圧縮
+      const { data, mimeType: newMimeType } = await import("../utils.js").then(
+        (module) => module.compressImageIfNeeded(imageData, maxSizeBytes)
+      );
+      processedImageData = data;
+      mimeType = newMimeType;
+    }
+  }
+
+  const result = await api.uploadImage(processedImageData, {
     title,
     description,
     refererUrl,
