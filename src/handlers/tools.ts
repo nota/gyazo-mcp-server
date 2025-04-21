@@ -223,7 +223,9 @@ async function handleGyazoImage(request: any) {
   if (!gyazoImage) {
     throw new Error("Image not found");
   }
-  const imageBase64 = await api.fetchImageAsBase64(gyazoImage.url);
+  const { data: imageBase64, mimeType } = await api.fetchImageAsBase64(
+    gyazoImage.url
+  );
   const imageMetadataMarkdown = getImageMetadataMarkdown(gyazoImage);
 
   return {
@@ -231,7 +233,7 @@ async function handleGyazoImage(request: any) {
       {
         type: "image",
         data: imageBase64,
-        mimeType: `image/${gyazoImage.type}`,
+        mimeType: mimeType,
       },
       {
         type: "text",
@@ -252,14 +254,16 @@ async function handleGyazoLatestImage() {
   }
 
   const image = images[0];
-  const imageBase64 = await api.fetchImageAsBase64(image.url);
+  const { data: imageBase64, mimeType } = await api.fetchImageAsBase64(
+    image.url
+  );
 
   return {
     content: [
       {
         type: "image",
         data: imageBase64,
-        mimeType: `image/${image.type}`,
+        mimeType: mimeType,
       },
       {
         type: "text",

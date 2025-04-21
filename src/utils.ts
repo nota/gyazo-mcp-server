@@ -1,6 +1,7 @@
 /**
  * Utility functions
  */
+import sharp from "sharp";
 import { GyazoImage } from "./types.js";
 
 /**
@@ -46,4 +47,84 @@ export function extractImageIdFromUri(uri: string): string {
  */
 export function createImageUri(imageId: string): string {
   return `gyazo-mcp:///${imageId}`;
+}
+
+/**
+ * Compress image if its Base64 size exceeds the maximum allowed size
+ * @param base64Data Base64 encoded image data
+ * @param maxSizeBytes Maximum allowed size in bytes
+ * @returns Object containing compressed Base64 data and the mime type
+ */
+export async function compressImageIfNeeded(
+  base64Data: string,
+  maxSizeBytes: number = 0.75 * 1024 * 1024 // 0.75MB default
+): Promise<{ data: string; mimeType: string }> {
+  // データサイズをチェック
+  let imageBuffer: Buffer;
+  let originalMimeType = "image/png"; // デフォルト値
+
+  // Base64データの形式を確認
+  if (base64Data.startsWith("data:")) {
+    // data:URLからMIMEタイプを抽出
+    const matches = base64Data.match(/^data:([^;]+);base64,(.*)$/);
+    if (matches && matches.length >= 3) {
+      originalMimeType = matches[1];
+      imageBuffer = Buffer.from(matches[2], "base64");
+    } else {
+      throw new Error("Invalid data URL format");
+    }
+  } else {
+    // 純粋なBase64文字列
+    imageBuffer = Buffer.from(base64Data, "base64");
+  }
+
+  // サイズをチェック
+  if (imageBuffer.length <= maxSizeBytes) {
+    // サイズが制限内なら元のデータを返す
+    return {
+      data: base64Data,
+      mimeType: originalMimeType,
+    };
+  }
+
+  console.log(
+    `Image size (${imageBuffer.length} bytes) exceeds maximum allowed size (${maxSizeBytes} bytes). Compressing...`
+  );
+
+  // 初期の圧縮品質
+  let quality = 90;
+  let compressedBuffer: Buffer;
+
+  // 画像サイズが目標サイズ以下になるまで圧縮品質を下げる
+  do {
+    // Sharpを使ってJPEG形式に変換し圧縮
+    compressedBuffer = await sharp(imageBuffer).jpeg({ quality }).toBuffer();
+
+    // 圧縮品質を下げる
+    quality -= 10;
+
+    // 最低品質の設定
+    if (quality < 10) {
+      quality = 10;
+      // 最後の試行
+      compressedBuffer = await sharp(imageBuffer).jpeg({ quality }).toBuffer();
+      break;
+    }
+  } while (compressedBuffer.length > maxSizeBytes);
+
+  console.log(
+    `Compressed image to JPEG with quality ${quality + 10}%. New size: ${
+      compressedBuffer.length
+    } bytes`
+  );
+
+  // Base64に変換
+  const compressedBase64 = `data:image/jpeg;base64,${compressedBuffer.toString(
+    "base64"
+  )}`;
+
+  return {
+    data: compressedBase64,
+    mimeType: "image/jpeg",
+  };
 }

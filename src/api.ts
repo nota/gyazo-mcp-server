@@ -7,6 +7,7 @@ import {
   SearchedGyazoImage,
   GyazoUploadResponse,
 } from "./types.js";
+import { compressImageIfNeeded } from "./utils.js";
 
 /**
  * Fetch image list from Gyazo API
@@ -54,11 +55,38 @@ export async function fetchImageMetadata(imageId: string): Promise<GyazoImage> {
 
 /**
  * Fetch image data as Base64 from image URL
+ * @returns Object containing Base64 encoded image data and MIME type
  */
-export async function fetchImageAsBase64(imageUrl: string): Promise<string> {
-  const imageBlob = await fetch(imageUrl).then((res) => res.blob());
+export async function fetchImageAsBase64(
+  imageUrl: string
+): Promise<{ data: string; mimeType: string }> {
+  const response = await fetch(imageUrl);
+  const contentType = response.headers.get("content-type") || "image/png";
+  const imageBlob = await response.blob();
   const imageBuffer = await imageBlob.arrayBuffer();
-  return Buffer.from(imageBuffer).toString("base64");
+  const base64Data = Buffer.from(imageBuffer).toString("base64");
+
+  // 最大サイズは0.75MBに設定
+  const maxSizeBytes = 0.75 * 1024 * 1024;
+
+  // データサイズをチェック
+  if (Buffer.from(base64Data, "base64").length > maxSizeBytes) {
+    // データサイズが制限を超えていたら圧縮する
+    // 先頭でインポート済みのcompressImageIfNeeded関数を使用
+    const compressedResult = await compressImageIfNeeded(
+      base64Data,
+      maxSizeBytes
+    );
+
+    // 圧縮した場合は圧縮結果のデータとMIMEタイプを返す
+    // 圧縮結果のMIMEタイプは必ず'image/jpeg'
+    return compressedResult;
+  }
+
+  return {
+    data: `data:${contentType};base64,${base64Data}`,
+    mimeType: contentType,
+  };
 }
 
 /**
