@@ -18,44 +18,16 @@ export const listToolsHandler = {
     return {
       tools: [
         {
-          name: "gyazo_latest_image",
-          description:
-            "Fetch latest uploaded image content and metadata from Gyazo",
-          inputSchema: {
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-                const: "gyazo_latest_image",
-              },
-            },
-            required: ["name"],
-          },
-        },
-        {
-          name: "gyazo_image",
-          description: "Fetch image content and metadata from Gyazo",
-          inputSchema: {
-            type: "object",
-            properties: {
-              id: {
-                type: "string",
-                description: "ID of the Gyazo image",
-              },
-            },
-            required: ["id"],
-          },
-        },
-        {
           name: "gyazo_search",
-          description: "Full-text search through user's saved Gyazo images",
+          description:
+            "Full-text search for captures uploaded by users on Gyazo",
           inputSchema: {
             type: "object",
             properties: {
               query: {
                 type: "string",
                 description:
-                  "Search keyword (max length: 200 characters). example: 'cat', 'title:cat', 'app:\"Google Chrome\"', 'cat since:2024-01-01 until:2024-12-31'",
+                  "Search keyword (max length: 200 characters). example: 'cat', 'title:cat', 'app:\"Google Chrome\"', 'url:google.com', 'cat since:2024-01-01 until:2024-12-31' NOTE: If you cannot find an appropriate capture, try rephrasing the search query to capture the user's intent and repeat the search several times",
               },
               page: {
                 type: "integer",
@@ -72,6 +44,35 @@ export const listToolsHandler = {
               },
             },
             required: ["query"],
+          },
+        },
+        {
+          name: "gyazo_image",
+          description: "Fetch image content and metadata from Gyazo",
+          inputSchema: {
+            type: "object",
+            properties: {
+              id_or_url: {
+                type: "string",
+                description: "ID or URL of the image on Gyazo",
+              },
+            },
+            required: ["id_or_url"],
+          },
+        },
+        {
+          name: "gyazo_latest_image",
+          description:
+            "Fetch latest uploaded image content and metadata from Gyazo",
+          inputSchema: {
+            type: "object",
+            properties: {
+              name: {
+                type: "string",
+                const: "gyazo_latest_image",
+              },
+            },
+            required: ["name"],
           },
         },
         {
@@ -94,12 +95,11 @@ export const listToolsHandler = {
               },
               refererUrl: {
                 type: "string",
-                description: "URL where the image was captured from (optional)",
+                description: "Source URL for the image (optional).",
               },
               app: {
                 type: "string",
-                description:
-                  "Application name that captured the image (optional)",
+                description: "Application name for the image (optional).",
               },
             },
             required: ["imageData"],
@@ -120,10 +120,10 @@ export const callToolHandler = {
       switch (request.params.name) {
         case "gyazo_search":
           return await handleGyazoSearch(request);
-        case "gyazo_latest_image":
-          return await handleGyazoLatestImage();
         case "gyazo_image":
           return await handleGyazoImage(request);
+        case "gyazo_latest_image":
+          return await handleGyazoLatestImage();
         case "gyazo_upload":
           return await handleGyazoUpload(request);
         default:
@@ -202,6 +202,46 @@ async function handleGyazoSearch(request: any) {
 }
 
 /**
+ * Handler for gyazo_image tool
+ */
+async function handleGyazoImage(request: any) {
+  if (
+    !request.params.arguments ||
+    typeof request.params.arguments.id_or_url !== "string"
+  ) {
+    throw new Error(
+      "Invalid image arguments: id_or_url is required and must be a string"
+    );
+  }
+
+  const imageIdOrUrl = request.params.arguments.id_or_url;
+  const imageId = imageIdOrUrl.startsWith("http")
+    ? imageIdOrUrl.split("/").pop()
+    : imageIdOrUrl;
+
+  const gyazoImage = await api.fetchImageMetadata(imageId);
+  if (!gyazoImage) {
+    throw new Error("Image not found");
+  }
+  const imageBase64 = await api.fetchImageAsBase64(gyazoImage.url);
+  const imageMetadataMarkdown = getImageMetadataMarkdown(gyazoImage);
+
+  return {
+    content: [
+      {
+        type: "image",
+        data: imageBase64,
+        mimeType: `image/${gyazoImage.type}`,
+      },
+      {
+        type: "text",
+        text: imageMetadataMarkdown,
+      },
+    ],
+  };
+}
+
+/**
  * Handler for gyazo_latest_image tool
  */
 async function handleGyazoLatestImage() {
@@ -224,39 +264,6 @@ async function handleGyazoLatestImage() {
       {
         type: "text",
         text: getImageMetadataMarkdown(image),
-      },
-    ],
-  };
-}
-
-/**
- * Handler for gyazo_image tool
- */
-async function handleGyazoImage(request: any) {
-  if (
-    !request.params.arguments ||
-    typeof request.params.arguments.id !== "string"
-  ) {
-    throw new Error(
-      "Invalid image arguments: id is required and must be a string"
-    );
-  }
-
-  const imageId = request.params.arguments.id;
-  const gyazoImage = await api.fetchImageMetadata(imageId);
-  const imageBase64 = await api.fetchImageAsBase64(gyazoImage.url);
-  const imageMetadataMarkdown = getImageMetadataMarkdown(gyazoImage);
-
-  return {
-    content: [
-      {
-        type: "image",
-        data: imageBase64,
-        mimeType: `image/${gyazoImage.type}`,
-      },
-      {
-        type: "text",
-        text: imageMetadataMarkdown,
       },
     ],
   };
