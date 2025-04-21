@@ -1,0 +1,8 @@
+# Configure GitHub language statistics
+
+# Mark built JavaScript files as generated to exclude from language statistics
+build/**/*.js linguist-generated=true
+
+# Explicitly mark TypeScript as the main language
+*.ts linguist-detectable=true
+*.ts linguist-language=TypeScript
