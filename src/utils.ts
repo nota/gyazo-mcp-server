@@ -87,10 +87,6 @@ export async function compressImageIfNeeded(
     };
   }
 
-  console.log(
-    `Image size (${imageBuffer.length} bytes) exceeds maximum allowed size (${maxSizeBytes} bytes). Compressing...`
-  );
-
   // 初期の圧縮品質
   let quality = 90;
   let compressedBuffer: Buffer;
@@ -111,12 +107,6 @@ export async function compressImageIfNeeded(
       break;
     }
   } while (compressedBuffer.length > maxSizeBytes);
-
-  console.log(
-    `Compressed image to JPEG with quality ${quality + 10}%. New size: ${
-      compressedBuffer.length
-    } bytes`
-  );
 
   // Base64に変換
   const compressedBase64 = `data:image/jpeg;base64,${compressedBuffer.toString(

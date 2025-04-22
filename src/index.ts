@@ -55,7 +55,6 @@ server.setRequestHandler(callToolHandler.schema, callToolHandler.handler);
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log(`${SERVER_CONFIG.name} server started`);
 }
 
 main().catch((error) => {
