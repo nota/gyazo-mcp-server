@@ -82,7 +82,7 @@ export async function compressImageIfNeeded(
   if (imageBuffer.length <= maxSizeBytes) {
     // サイズが制限内なら元のデータを返す
     return {
-      data: base64Data,
+      data: imageBuffer.toString("base64"),
       mimeType: originalMimeType,
     };
   }
@@ -109,9 +109,7 @@ export async function compressImageIfNeeded(
   } while (compressedBuffer.length > maxSizeBytes);
 
   // Base64に変換
-  const compressedBase64 = `data:image/jpeg;base64,${compressedBuffer.toString(
-    "base64"
-  )}`;
+  const compressedBase64 = `${compressedBuffer.toString("base64")}`;
 
   return {
     data: compressedBase64,
