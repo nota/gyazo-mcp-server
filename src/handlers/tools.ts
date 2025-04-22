@@ -231,13 +231,13 @@ async function handleGyazoImage(request: any) {
   return {
     content: [
       {
+        type: "text",
+        text: imageMetadataMarkdown,
+      },
+      {
         type: "image",
         data: imageBase64,
         mimeType: mimeType,
-      },
-      {
-        type: "text",
-        text: imageMetadataMarkdown,
       },
     ],
   };
