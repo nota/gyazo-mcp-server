@@ -1,7 +1,7 @@
 {
   "name": "gyazo-mcp-server",
   "version": "0.1.0",
-  "description": "A MCP server for Gyazo",
+  "description": "Official Model Context Protocol server for Gyazo",
   "private": true,
   "type": "module",
   "bin": {
