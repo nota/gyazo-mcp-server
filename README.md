@@ -5,7 +5,7 @@ A Model Context Protocol server for Gyazo image integration
 This is a TypeScript-based MCP server that provides access to Gyazo images. It allows AI assistants to access and interact with Gyazo images through the Model Context Protocol, providing:
 
 - Resources representing Gyazo images with URIs and metadata
-- Tools for fetching the latest image
+- Tools for searching, fetching, and uploading images
 - Image content and metadata access via the Gyazo API
 
 ## Features
@@ -21,9 +21,26 @@ This is a TypeScript-based MCP server that provides access to Gyazo images. It a
 
 ### Tools
 
+- `gyazo_search` - Full-text search for captures uploaded by users on Gyazo
+
+  - Search by keyword, title, app, URL, or date range
+  - Supports pagination for browsing multiple results
+  - Returns matching image URIs and metadata
+
+- `gyazo_image` - Fetch image content and metadata from Gyazo
+
+  - Retrieve specific images by ID or URL
+  - Returns both image content and detailed metadata
+
 - `gyazo_latest_image` - Fetch the most recent image from Gyazo
+
   - Returns both image content and metadata
   - Includes OCR text if available
+
+- `gyazo_upload` - Upload an image to Gyazo
+  - Upload images with base64 encoded image data
+  - Add optional metadata like title, description, referer URL, and app name
+  - Returns the uploaded image's permalink URL and ID
 
 ## Installation
 
