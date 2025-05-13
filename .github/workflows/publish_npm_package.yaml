@@ -1,0 +1,26 @@
+name: publish_npm_package
+
+on:
+  push:
+    branches:
+      - main
+    tags: ['v*']
+
+jobs:
+  publish:
+    name: 'Publish npm package'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          tag_name: 'v%s'
+          node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@notainc'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
