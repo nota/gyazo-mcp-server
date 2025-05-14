@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/nota-gyazo-mcp-server-badge.png)](https://mseep.ai/app/nota-gyazo-mcp-server)
+
 # gyazo-mcp-server
 
 A Model Context Protocol server for Gyazo image integration
