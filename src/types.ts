@@ -51,3 +51,25 @@ export type GyazoUploadResponse = {
   url: string;
   thumb_url?: string;
 };
+
+/**
+ * Type definition for capturable window
+ */
+export type CapturableWindow = {
+  handle: string;
+  title: string;
+  processName: string;
+  isVisible: boolean;
+  zOrder: number;
+};
+
+/**
+ * Type definition for capture and upload response
+ */
+export type CaptureUploadResponse = {
+  image_id: string;
+  permalink_url: string;
+  url: string;
+  data: string; // Base64 image data
+  mimeType: string;
+};

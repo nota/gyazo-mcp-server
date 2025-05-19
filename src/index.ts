@@ -16,6 +16,7 @@ import {
   readResourceHandler,
 } from "./handlers/resources.js";
 import { listToolsHandler, callToolHandler } from "./handlers/tools.js";
+import { GyazoNativeMCPServer } from "./capture-proxy.js";
 
 /**
  * Create MCP server
@@ -57,7 +58,22 @@ async function main() {
   await server.connect(transport);
 }
 
+// Setup cleanup handlers for graceful shutdown
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
+process.on("exit", cleanup);
+
+// Cleanup function for graceful shutdown
+function cleanup() {
+  // Clean up the native MCP server if it was initialized
+  const nativeServer = GyazoNativeMCPServer.getInstance();
+  if (nativeServer) {
+    nativeServer.cleanup();
+  }
+}
+
 main().catch((error) => {
-  console.error("Server error:", error);
+  // stdioを汚染しないため標準エラー出力を使用（process.stderrは非同期APIでstdioと分離されている）
+  process.stderr.write(`Server error: ${error}\n`);
   process.exit(1);
 });
