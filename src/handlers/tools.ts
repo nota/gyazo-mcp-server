@@ -113,68 +113,61 @@ export const listToolsHandler = {
       },
     ];
 
-    // Check if native capture tools are available
-    const isCaptureAvailable = await checkNativeCaptureAvailability();
-
-    // Native capture tools available only in Windows/macOS with Gyazo installed
-    const captureTools = isCaptureAvailable
-      ? [
-          {
-            name: "gyazo_capture_and_upload_region",
-            description:
-              "Initiates a UI for region selection. Captures the selected screen area, uploads it to Gyazo, and returns the Gyazo image URL and image data.",
-            inputSchema: {
-              type: "object",
-              properties: {},
-              title: "capture_and_upload_region",
+    const captureTools = [
+      {
+        name: "gyazo_capture_and_upload_region",
+        description:
+          "Initiates a UI for region selection. Captures the selected screen area, uploads it to Gyazo, and returns the Gyazo image URL and image data.",
+        inputSchema: {
+          type: "object",
+          properties: {},
+          title: "capture_and_upload_region",
+        },
+      },
+      {
+        name: "gyazo_capture_and_upload_primary_screen",
+        description:
+          "Captures the entire primary screen, uploads it to Gyazo, and returns both the Gyazo image URL and image data.",
+        inputSchema: {
+          type: "object",
+          properties: {},
+          title: "capture_and_upload_primary_screen",
+        },
+      },
+      {
+        name: "gyazo_capture_and_upload_window",
+        description:
+          "Captures the specified window, uploads it to Gyazo, and returns both the Gyazo image URL and image data.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            windowHandle: {
+              type: "string",
+              description:
+                "Hexadecimal string of the window handle to capture. Use the value obtained from calling list_capturable_windows.",
             },
           },
-          {
-            name: "gyazo_capture_and_upload_primary_screen",
-            description:
-              "Captures the entire primary screen, uploads it to Gyazo, and returns both the Gyazo image URL and image data.",
-            inputSchema: {
-              type: "object",
-              properties: {},
-              title: "capture_and_upload_primary_screen",
+          required: ["windowHandle"],
+          title: "capture_and_upload_window",
+        },
+      },
+      {
+        name: "gyazo_list_capturable_windows",
+        description: "Returns a list of windows available for screen capture.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            limit: {
+              type: "integer",
+              description:
+                "Maximum number of windows to retrieve. (Default value: 30)",
             },
           },
-          {
-            name: "gyazo_capture_and_upload_window",
-            description:
-              "Captures the specified window, uploads it to Gyazo, and returns both the Gyazo image URL and image data.",
-            inputSchema: {
-              type: "object",
-              properties: {
-                windowHandle: {
-                  type: "string",
-                  description:
-                    "Hexadecimal string of the window handle to capture. Use the value obtained from calling list_capturable_windows.",
-                },
-              },
-              required: ["windowHandle"],
-              title: "capture_and_upload_window",
-            },
-          },
-          {
-            name: "gyazo_list_capturable_windows",
-            description:
-              "Returns a list of windows available for screen capture.",
-            inputSchema: {
-              type: "object",
-              properties: {
-                limit: {
-                  type: "integer",
-                  description:
-                    "Maximum number of windows to retrieve. (Default value: 30)",
-                },
-              },
-              required: ["limit"],
-              title: "list_capturable_windows",
-            },
-          },
-        ]
-      : [];
+          required: ["limit"],
+          title: "list_capturable_windows",
+        },
+      },
+    ];
 
     return {
       tools: [...standardTools, ...captureTools],

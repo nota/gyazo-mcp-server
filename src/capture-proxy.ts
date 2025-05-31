@@ -221,7 +221,7 @@ export async function listCapturableWindows(limit: number = 30): Promise<any> {
   return await server.sendRequest({
     method: "mcp.callTool",
     params: {
-      name: "list_capturable_windows",
+      name: "gyazo_list_capturable_windows",
       arguments: { limit },
     },
   });
@@ -240,7 +240,7 @@ export async function captureAndUploadPrimaryScreen(): Promise<any> {
   return await server.sendRequest({
     method: "mcp.callTool",
     params: {
-      name: "capture_and_upload_primary_screen",
+      name: "gyazo_capture_and_upload_primary_screen",
       arguments: {},
     },
   });
@@ -259,7 +259,7 @@ export async function captureAndUploadRegion(): Promise<any> {
   return await server.sendRequest({
     method: "mcp.callTool",
     params: {
-      name: "capture_and_upload_region",
+      name: "gyazo_capture_and_upload_region",
       arguments: {},
     },
   });
@@ -280,7 +280,7 @@ export async function captureAndUploadWindow(
   return await server.sendRequest({
     method: "mcp.callTool",
     params: {
-      name: "capture_and_upload_window",
+      name: "gyazo_capture_and_upload_window",
       arguments: { windowHandle },
     },
   });
