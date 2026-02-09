@@ -1,14 +1,17 @@
 # Gyazo API Specification
 
 ## Overview
+
 This document provides the specifications for the Gyazo API, including the Image, Search, and User APIs.
 
 ## Image API
 
 ### List
+
 The API request to get a list of a user’s saved images.
 
 **URL**
+
 ```
 GET https://api.gyazo.com/api/images
 ```
@@ -16,7 +19,7 @@ GET https://api.gyazo.com/api/images
 **Parameters**
 
 | Parameter    | Type    | Required | Default | Description                        |
-|--------------|---------|----------|---------|------------------------------------|
+| ------------ | ------- | -------- | ------- | ---------------------------------- |
 | access_token | string  | ✓        | -       | User's access token                |
 | page         | integer | -        | 1       | Page number for pagination         |
 | per_page     | integer | -        | 20      | Number of results per page (1-100) |
@@ -34,31 +37,33 @@ X-User-Type:    lite
 
 ```json
 [
-    {
-        "image_id": "8980c52421e452ac3355ca3e5cfe7a0c",
-        "permalink_url": "http://gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c",
-        "thumb_url": "https://i.gyazo.com/thumb/afaiefnaf.png",
-        "url": "https://i.gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c.png",
-        "type": "png",
-        "created_at": "2014-05-21 14:23:10+0900",
-        "metadata": {
-           "app": null,
-           "title": null,
-           "url": null,
-           "desc": ""
-        },
-        "ocr": {
-           "locale": "en",
-           "description": "Gyazo\n"
-        }
+  {
+    "image_id": "8980c52421e452ac3355ca3e5cfe7a0c",
+    "permalink_url": "http://gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c",
+    "thumb_url": "https://i.gyazo.com/thumb/afaiefnaf.png",
+    "url": "https://i.gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c.png",
+    "type": "png",
+    "created_at": "2014-05-21 14:23:10+0900",
+    "metadata": {
+      "app": null,
+      "title": null,
+      "url": null,
+      "desc": ""
+    },
+    "ocr": {
+      "locale": "en",
+      "description": "Gyazo\n"
     }
+  }
 ]
 ```
 
 ### Image
+
 The API request to get an image.
 
 **URL**
+
 ```
 GET https://api.gyazo.com/api/images/:image_id
 ```
@@ -66,7 +71,7 @@ GET https://api.gyazo.com/api/images/:image_id
 **Parameters**
 
 | Parameter    | Type   | Required | Default | Description         |
-|--------------|--------|----------|---------|---------------------|
+| ------------ | ------ | -------- | ------- | ------------------- |
 | access_token | string | ✓        | -       | User's access token |
 | image_id     | string | ✓        | -       |                     |
 
@@ -93,109 +98,117 @@ GET https://api.gyazo.com/api/images/:image_id
 ```
 
 ### Upload
+
 The API request to upload an image.
 
 **URL**
+
 ```
 POST https://upload.gyazo.com/api/upload
 ```
 
 **Parameters**
 
-| Parameter          | Type   | Required | Default | Description                                                                 |
-|--------------------|--------|----------|---------|-----------------------------------------------------------------------------|
-| access_token       | string | ✓        | -       | User's access token                                                         |
+| Parameter          | Type   | Required | Default | Description                                                                      |
+| ------------------ | ------ | -------- | ------- | -------------------------------------------------------------------------------- |
+| access_token       | string | ✓        | -       | User's access token                                                              |
 | imagedata          | binary | ✓        | -       | Specify `filename` directive in Content-Disposition part in multipart/form-data. |
-| access_policy      | string | -        | anyone  | Access policy for images (`anyone` or `only_me`)                            |
-| metadata_is_public | string | -        | -       | Boolean value about publish URL and title metadata                          |
-| referer_url        | string | -        | -       | Referer site URL                                                            |
-| app                | string | -        | -       | Application name                                                            |
-| title              | string | -        | -       | Site title                                                                  |
-| desc               | string | -        | -       | Comment                                                                     |
-| created_at         | float  | -        | -       | Image's created time, Unix time                                             |
-| collection_id      | string | -        | -       | Add image to collection                                                     |
+| access_policy      | string | -        | anyone  | Access policy for images (`anyone` or `only_me`)                                 |
+| metadata_is_public | string | -        | -       | Boolean value about publish URL and title metadata                               |
+| referer_url        | string | -        | -       | Referer site URL                                                                 |
+| app                | string | -        | -       | Application name                                                                 |
+| title              | string | -        | -       | Site title                                                                       |
+| desc               | string | -        | -       | Comment                                                                          |
+| created_at         | float  | -        | -       | Image's created time, Unix time                                                  |
+| collection_id      | string | -        | -       | Add image to collection                                                          |
 
 **Response**
 
 ```json
 {
-    "image_id" : "8980c52421e452ac3355ca3e5cfe7a0c",
-    "permalink_url": "http://gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c",
-    "thumb_url" : "https://i.gyazo.com/thumb/180/afaiefnaf.png",
-    "url" : "https://i.gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c.png",
-    "type": "png"
+  "image_id": "8980c52421e452ac3355ca3e5cfe7a0c",
+  "permalink_url": "http://gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c",
+  "thumb_url": "https://i.gyazo.com/thumb/180/afaiefnaf.png",
+  "url": "https://i.gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c.png",
+  "type": "png"
 }
 ```
 
 ### Delete
+
 The API request to delete an image.
 
 **URL**
+
 ```
 DELETE https://api.gyazo.com/api/images/:image_id
 ```
 
 **Parameters**
 
-| Parameter | Type   | Required | Default | Description                  |
-|-----------|--------|----------|---------|------------------------------|
+| Parameter | Type   | Required | Default | Description                         |
+| --------- | ------ | -------- | ------- | ----------------------------------- |
 | image_id  | string | ✓        | -       | You can only delete your own images |
 
 **Response**
 
 ```json
 {
-   "image_id": "8980c52421e452ac3355ca3e5cfe7a0c",
-   "type": "png"
+  "image_id": "8980c52421e452ac3355ca3e5cfe7a0c",
+  "type": "png"
 }
 ```
 
 ### oEmbed
+
 This API provides the image's raw URL.
 
 **URL**
+
 ```
 GET https://api.gyazo.com/api/oembed?url=:image_url
 ```
 
 **Parameters**
 
-| Parameter | Type   | Required | Default | Description                                      |
-|-----------|--------|----------|---------|--------------------------------------------------|
+| Parameter | Type   | Required | Default | Description                                             |
+| --------- | ------ | -------- | ------- | ------------------------------------------------------- |
 | url       | string | ✓        | -       | URL of Gyazo image page (http://gyazo.com/XXXXXXXXXXXX) |
 
 **Response**
 
 ```json
 {
-  "version":"1.0",
-  "type":"photo",
-  "provider_name":"Gyazo",
-  "provider_url":"https://gyazo.com",
-  "url":"http://i.gyazo.com/8c9d9c8ec14dec4631b6ec77d1c85450_1.png",
-  "width":617,
-  "height":597
+  "version": "1.0",
+  "type": "photo",
+  "provider_name": "Gyazo",
+  "provider_url": "https://gyazo.com",
+  "url": "http://i.gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c.png",
+  "width": 617,
+  "height": 597
 }
 ```
 
 ## Search API
 
 ### Overview
+
 The API request to search through a user's saved images.
 
 **URL**
+
 ```
 GET https://api.gyazo.com/api/search
 ```
 
 **Parameters**
 
-| Parameter    | Type    | Required | Default | Description                        |
-|--------------|---------|----------|---------|------------------------------------|
-| access_token | string  | ✓        | -       | User's access token                |
+| Parameter    | Type    | Required | Default | Description                               |
+| ------------ | ------- | -------- | ------- | ----------------------------------------- |
+| access_token | string  | ✓        | -       | User's access token                       |
 | query        | string  | ✓        | -       | Search query (max length: 200 characters) |
-| page         | integer | -        | 1       | Page number for pagination         |
-| per          | integer | -        | 20      | Number of results per page (max: 100) |
+| page         | integer | -        | 1       | Page number for pagination                |
+| per          | integer | -        | 20      | Number of results per page (max: 100)     |
 
 **Response**
 
@@ -203,25 +216,48 @@ The API returns an array of image objects with the following structure:
 
 ```json
 [
-    {
-        "image_id": "xxxxx",
-        "permalink_url": "https://gyazo.com/xxxxx",
-        "url": "https://i.gyazo.com/xxxxx.png",
-        "access_policy": null,
-        "type": "png",
-        "thumb_url": "https://thumb.gyazo.com/thumb/200/xxxxx.jpg",
-        "created_at": "2025-02-14T12:04:26+0000",
-        "alt_text": ""
-    }
+  {
+    "image_id": "8980c52421e452ac3355ca3e5cfe7a0c",
+    "permalink_url": "https://gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c",
+    "url": "https://i.gyazo.com/8980c52421e452ac3355ca3e5cfe7a0c.png",
+    "access_policy": "anyone",
+    "ocr": {
+      "locale": "en",
+      "description": "OCR extracted text content from the image"
+    },
+    "metadata": {
+      "app": "Chrome",
+      "title": "Page Title",
+      "url": "https://example.com",
+      "desc": "Description text",
+      "original_title": null,
+      "original_url": null
+    },
+    "type": "png",
+    "thumb_url": "https://thumb.gyazo.com/thumb/200/xxxxx.jpg",
+    "created_at": "2025-02-14T12:04:26+0000",
+    "alt_text": ""
+  }
 ]
 ```
 
 ### Response Fields
+
 - `image_id`: Unique identifier for the image
 - `permalink_url`: Permanent URL to view the image on Gyazo
 - `url`: Direct URL to the image file
-- `access_policy`: Access policy settings for the image
-- `type`: Image file format
+- `access_policy`: Access policy settings for the image (e.g., "anyone", "only_me")
+- `ocr`: OCR (Optical Character Recognition) results
+  - `locale`: Detected language code (e.g., "en", "ja", etc.)
+  - `description`: Extracted text content from the image
+- `metadata`: Image metadata
+  - `app`: Application name of the captured content
+  - `title`: Title of the page or document
+  - `url`: Source URL of the captured content
+  - `desc`: User-provided description
+  - `original_title`: Original title (if modified)
+  - `original_url`: Original URL (if modified)
+- `type`: Image file format (e.g., "png", "jpg", etc.)
 - `thumb_url`: URL of the image thumbnail
 - `created_at`: Timestamp of when the image was created (UTC)
 - `alt_text`: Alternative text for the image
@@ -229,9 +265,11 @@ The API returns an array of image objects with the following structure:
 ## User API
 
 ### Overview
+
 This API provides the information of the authenticated user.
 
 **URL**
+
 ```
 GET  https://api.gyazo.com/api/users/me
 ```
@@ -252,6 +290,7 @@ GET  https://api.gyazo.com/api/users/me
 ```
 
 ## Important Notes
+
 - The Search API is only available for Ninja users
 - The search query must be less than 200 characters
 - The maximum number of results per page is 100

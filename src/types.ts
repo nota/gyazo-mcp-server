@@ -36,6 +36,18 @@ export type SearchedGyazoImage = {
   permalink_url: string;
   url: string;
   access_policy: string | null;
+  ocr?: {
+    locale: string;
+    description: string;
+  };
+  metadata?: {
+    app: string | null;
+    title: string | null;
+    url: string | null;
+    desc: string;
+    original_title: string | null;
+    original_url: string | null;
+  };
   type: string;
   thumb_url: string;
   created_at: string;

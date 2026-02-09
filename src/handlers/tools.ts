@@ -149,7 +149,7 @@ async function handleGyazoSearch(request: any) {
     typeof request.params.arguments.query !== "string"
   ) {
     throw new Error(
-      "Invalid search arguments: query is required and must be a string"
+      "Invalid search arguments: query is required and must be a string",
     );
   }
 
@@ -165,7 +165,7 @@ async function handleGyazoSearch(request: any) {
   const images = await api.searchImages(
     request.params.arguments.query,
     page,
-    per
+    per,
   );
 
   if (!images || images.length === 0) {
@@ -187,6 +187,8 @@ async function handleGyazoSearch(request: any) {
       url: image.url,
       thumb_url: image.thumb_url,
       created_at: image.created_at,
+      ocr: image.ocr,
+      metadata: image.metadata,
       alt_text: image.alt_text,
     };
   });
@@ -210,7 +212,7 @@ async function handleGyazoImage(request: any) {
     typeof request.params.arguments.id_or_url !== "string"
   ) {
     throw new Error(
-      "Invalid image arguments: id_or_url is required and must be a string"
+      "Invalid image arguments: id_or_url is required and must be a string",
     );
   }
 
@@ -224,7 +226,7 @@ async function handleGyazoImage(request: any) {
     throw new Error("Image not found");
   }
   const { data: imageBase64, mimeType } = await api.fetchImageAsBase64(
-    gyazoImage.url
+    gyazoImage.url,
   );
   const imageMetadataMarkdown = getImageMetadataMarkdown(gyazoImage);
 
@@ -255,7 +257,7 @@ async function handleGyazoLatestImage() {
 
   const image = images[0];
   const { data: imageBase64, mimeType } = await api.fetchImageAsBase64(
-    image.url
+    image.url,
   );
 
   return {
@@ -282,7 +284,7 @@ async function handleGyazoUpload(request: any) {
     typeof request.params.arguments.imageData !== "string"
   ) {
     throw new Error(
-      "Invalid upload arguments: imageData is required and must be a string"
+      "Invalid upload arguments: imageData is required and must be a string",
     );
   }
 
