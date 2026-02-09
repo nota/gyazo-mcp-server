@@ -1,7 +1,7 @@
 /**
  * Module for handling communication with the Gyazo API
  */
-import { API_ENDPOINTS, GYAZO_ACCESS_TOKEN } from "./config.js";
+import { API_ENDPOINTS, getAccessToken } from "./config.js";
 import {
   GyazoImage,
   SearchedGyazoImage,
@@ -14,10 +14,10 @@ import { compressImageIfNeeded } from "./utils.js";
  */
 export async function fetchImageList(
   page = 1,
-  perPage = 10
+  perPage = 10,
 ): Promise<GyazoImage[]> {
   const params = new URLSearchParams();
-  params.append("access_token", GYAZO_ACCESS_TOKEN as string);
+  params.append("access_token", getAccessToken());
   params.append("page", page.toString());
   params.append("per_page", perPage.toString());
 
@@ -36,7 +36,7 @@ export async function fetchImageList(
  */
 export async function fetchImageMetadata(imageId: string): Promise<GyazoImage> {
   const params = new URLSearchParams();
-  params.append("access_token", GYAZO_ACCESS_TOKEN as string);
+  params.append("access_token", getAccessToken());
 
   const url = `${API_ENDPOINTS.IMAGE(imageId)}?${params.toString()}`;
   const response = await fetch(url);
@@ -58,7 +58,7 @@ export async function fetchImageMetadata(imageId: string): Promise<GyazoImage> {
  * @returns Object containing Base64 encoded image data and MIME type
  */
 export async function fetchImageAsBase64(
-  imageUrl: string
+  imageUrl: string,
 ): Promise<{ data: string; mimeType: string }> {
   const response = await fetch(imageUrl);
   const contentType = response.headers.get("content-type") || "image/png";
@@ -75,7 +75,7 @@ export async function fetchImageAsBase64(
     // 先頭でインポート済みのcompressImageIfNeeded関数を使用
     const compressedResult = await compressImageIfNeeded(
       base64Data,
-      maxSizeBytes
+      maxSizeBytes,
     );
 
     // 圧縮した場合は圧縮結果のデータとMIMEタイプを返す
@@ -95,10 +95,10 @@ export async function fetchImageAsBase64(
 export async function searchImages(
   query: string,
   page = 1,
-  per = 20
+  per = 20,
 ): Promise<SearchedGyazoImage[]> {
   const params = new URLSearchParams();
-  params.append("access_token", GYAZO_ACCESS_TOKEN as string);
+  params.append("access_token", getAccessToken());
   params.append("query", query);
   params.append("page", page.toString());
   params.append("per", per.toString());
@@ -123,7 +123,7 @@ export async function uploadImage(
     description?: string;
     refererUrl?: string;
     app?: string;
-  }
+  },
 ): Promise<GyazoUploadResponse> {
   // Remove prefix from Base64 data
   const base64Image = imageData.replace(/^data:image\/(\w+);base64,/, "");
@@ -165,7 +165,7 @@ export async function uploadImage(
   }
 
   // Add access token
-  formData.append("access_token", GYAZO_ACCESS_TOKEN as string);
+  formData.append("access_token", getAccessToken());
 
   // Send upload request
   const response = await fetch(API_ENDPOINTS.UPLOAD, {
