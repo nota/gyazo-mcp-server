@@ -262,6 +262,12 @@ The API returns an array of image objects with the following structure:
 - `created_at`: Timestamp of when the image was created (UTC)
 - `alt_text`: Alternative text for the image
 
+**Note:**
+
+- The `ocr` field is only included when OCR data is available for the image. When OCR is not available, this field will not be present in the response.
+- The `metadata` field is always present in the response object as long as the image is owned by the user, but individual property values may be `undefined`, `null`, or empty strings when the corresponding data is not available.
+- The `alt_text` field is always present in the response object.
+
 ## User API
 
 ### Overview

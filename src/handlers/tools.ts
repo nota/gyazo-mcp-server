@@ -187,7 +187,7 @@ async function handleGyazoSearch(request: any) {
       url: image.url,
       thumb_url: image.thumb_url,
       created_at: image.created_at,
-      ocr: image.ocr,
+      ...(image.ocr !== undefined ? { ocr: image.ocr } : {}),
       metadata: image.metadata,
       alt_text: image.alt_text,
     };

@@ -40,7 +40,7 @@ export type SearchedGyazoImage = {
     locale: string;
     description: string;
   };
-  metadata?: {
+  metadata: {
     app: string | null;
     title: string | null;
     url: string | null;
