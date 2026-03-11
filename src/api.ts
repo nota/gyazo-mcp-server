@@ -84,7 +84,7 @@ export async function fetchImageAsBase64(
   }
 
   return {
-    data: `data:${contentType};base64,${base64Data}`,
+    data: base64Data,
     mimeType: contentType,
   };
 }
