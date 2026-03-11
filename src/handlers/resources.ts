@@ -21,7 +21,7 @@ export const listResourcesHandler = {
         resources: gyazoImages.map((gyazoImage) => ({
           uri: `gyazo-mcp:///${gyazoImage.image_id}`,
           mimeType: `image/${gyazoImage.type}`,
-          name: gyazoImage.metadata.title || gyazoImage.image_id,
+          name: gyazoImage.metadata?.title || gyazoImage.image_id,
         })),
       };
     } catch (error) {
