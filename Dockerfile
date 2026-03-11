@@ -14,7 +14,4 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Add environment variable for Gyazo access token
-ENV GYAZO_ACCESS_TOKEN=dummy_token
-
 CMD ["node", "build/index.js"]

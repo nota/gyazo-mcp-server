@@ -10,7 +10,8 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { SERVER_CONFIG } from "./config.js";
+import { SERVER_CONFIG, setAccessToken } from "./config.js";
+import { loadStoredToken, runOAuthFlow } from "./auth.js";
 import {
   listResourcesHandler,
   readResourceHandler,
@@ -49,10 +50,58 @@ server.setRequestHandler(listToolsHandler.schema, listToolsHandler.handler);
 server.setRequestHandler(callToolHandler.schema, callToolHandler.handler);
 
 /**
+ * Ensure access token is available, running OAuth flow if needed
+ */
+async function ensureAccessToken(): Promise<void> {
+  if (process.env.GYAZO_ACCESS_TOKEN) {
+    return;
+  }
+
+  const storedToken = loadStoredToken();
+  if (storedToken) {
+    setAccessToken(storedToken);
+    return;
+  }
+
+  const clientId = process.env.GYAZO_CLIENT_ID;
+  const clientSecret = process.env.GYAZO_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      "No access token available. Set GYAZO_ACCESS_TOKEN, or set GYAZO_CLIENT_ID and GYAZO_CLIENT_SECRET for OAuth.",
+    );
+  }
+
+  const token = await runOAuthFlow(clientId, clientSecret);
+  setAccessToken(token);
+}
+
+/**
+ * Run OAuth authentication flow and exit
+ */
+async function authMode(): Promise<void> {
+  const clientId = process.env.GYAZO_CLIENT_ID;
+  const clientSecret = process.env.GYAZO_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    console.error(
+      "GYAZO_CLIENT_ID and GYAZO_CLIENT_SECRET environment variables are required for OAuth.",
+    );
+    process.exit(1);
+  }
+
+  await runOAuthFlow(clientId, clientSecret);
+}
+
+/**
  * Start the server using stdio transport
  * Communicate via standard input/output streams
  */
 async function main() {
+  if (process.argv.includes("--auth")) {
+    await authMode();
+    return;
+  }
+
+  await ensureAccessToken();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

@@ -55,27 +55,43 @@ npm install -g @notainc/gyazo-mcp-server
 ### Prerequisites
 
 - Create a Gyazo account if you don't have one: https://gyazo.com
-- Get your Gyazo API access token from: https://gyazo.com/api
-  - Click "Register applications" button
-  - Click "New Application" button
-  - Fill in the form with your app name and description
-    - Name and Callback URL are required
-    - You can use `http://localhost` for the Callback URL
-  - Click "Submit" button
-  - Click application name to view details
-  - Scroll down to "Your Access Token"
-  - Click "Generate" button
-  - Copy "Your access token" value
-- Set the `GYAZO_ACCESS_TOKEN` environment variable with your token
+- Choose one of the following authentication methods:
 
-### Claude Desktop Integration
+#### Option A: Personal Access Token
 
-To use with Claude Desktop, add the server config:
+1. Go to https://gyazo.com/api
+2. Click "Register applications" > "New Application"
+3. Fill in the form (Name and Callback URL are required; you can use `http://localhost` for the Callback URL)
+4. Click "Submit", then click your application name to view details
+5. Scroll down to "Your Access Token" and click "Generate"
+6. Copy the access token value
+7. Set the `GYAZO_ACCESS_TOKEN` environment variable with your token
+
+#### Option B: OAuth Client Flow
+
+OAuth authentication allows access to images shared within your Gyazo Teams organization, not just your own uploads.
+
+1. Go to https://gyazo.com/oauth/applications and create a new application
+2. Set the Callback URL to `http://localhost:18439/callback`
+3. Note your `Client ID` and `Client Secret`
+4. Run the authentication flow:
+
+```bash
+GYAZO_CLIENT_ID=your-client-id \
+GYAZO_CLIENT_SECRET=your-client-secret \
+npx @notainc/gyazo-mcp-server --auth
+```
+
+This opens your browser for authorization and saves the token to `~/.gyazo-mcp/token.json`. You only need to do this once.
+
+### MCP Client Integration
+
+To use with MCP clients (Claude Desktop, Claude Code, etc.), add the server config:
 
 On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
-#### Using NPM package (recommended)
+#### Using NPM package with access token
 
 ```json
 {
@@ -91,7 +107,22 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 }
 ```
 
-#### Using Docker (optional)
+#### Using NPM package with OAuth token
+
+After running `--auth`, the stored token is used automatically:
+
+```json
+{
+  "mcpServers": {
+    "gyazo-mcp-server": {
+      "command": "npx",
+      "args": ["@notainc/gyazo-mcp-server"]
+    }
+  }
+}
+```
+
+#### Using Docker with access token
 
 ```json
 {
@@ -109,6 +140,28 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
       "env": {
         "GYAZO_ACCESS_TOKEN": "your-access-token-here"
       }
+    }
+  }
+}
+```
+
+#### Using Docker with OAuth token
+
+Mount the token file into the container:
+
+```json
+{
+  "mcpServers": {
+    "gyazo-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "~/.gyazo-mcp:/root/.gyazo-mcp",
+        "gyazo-mcp-server"
+      ]
     }
   }
 }
