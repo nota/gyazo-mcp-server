@@ -2,6 +2,7 @@
  * Configuration related processing
  */
 import dotenv from "dotenv";
+import { loadStoredToken } from "./auth.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -20,14 +21,37 @@ export const SERVER_CONFIG = {
   version: "0.1.0",
 };
 
+// Cached access token set by OAuth flow
+let cachedAccessToken: string | null = null;
+
+/**
+ * Set access token (called after OAuth flow completes)
+ */
+export function setAccessToken(token: string): void {
+  cachedAccessToken = token;
+}
+
 /**
  * Get Gyazo API access token
- * Validates that the token exists and throws an error if not
+ * Priority: env var > cached OAuth token > stored OAuth token
  */
 export function getAccessToken(): string {
-  const token = process.env.GYAZO_ACCESS_TOKEN;
-  if (!token) {
-    throw new Error("GYAZO_ACCESS_TOKEN environment variable is required");
+  const envToken = process.env.GYAZO_ACCESS_TOKEN;
+  if (envToken) {
+    return envToken;
   }
-  return token;
+
+  if (cachedAccessToken) {
+    return cachedAccessToken;
+  }
+
+  const storedToken = loadStoredToken();
+  if (storedToken) {
+    cachedAccessToken = storedToken;
+    return storedToken;
+  }
+
+  throw new Error(
+    "No access token available. Set GYAZO_ACCESS_TOKEN or configure GYAZO_CLIENT_ID and GYAZO_CLIENT_SECRET for OAuth.",
+  );
 }

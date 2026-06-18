@@ -12,11 +12,11 @@ export type GyazoImage = {
   url: string;
   type: string;
   created_at: string;
-  metadata: {
-    app: string;
-    title: string;
-    url: string;
-    desc: string;
+  metadata?: {
+    app?: string | null;
+    title?: string | null;
+    url?: string | null;
+    desc?: string | null;
   };
   ocr?: {
     locale: string;
